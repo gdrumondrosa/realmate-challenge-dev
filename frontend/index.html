@@ -1,0 +1,63 @@
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chat Viewer</title>
+  <style>
+    body { font-family: sans-serif; margin: 2rem; }
+    h1, h2 { color: #333; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 0.5rem; border-bottom: 1px solid #ddd; cursor: pointer; }
+    li:hover { background: #f9f9f9; }
+    #messages { margin-top: 2rem; }
+    #messages ul { max-height: 400px; overflow-y: auto; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <h1>Conversations</h1>
+  <ul id="conv-list"></ul>
+
+  <div id="messages" style="display:none;">
+    <h2>Messages for conversation: <span id="conv-id"></span></h2>
+    <ul id="msg-list"></ul>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:8000';
+
+    // Busca e renderiza lista de conversas
+    async function loadConversations() {
+      const res = await fetch(`${API_BASE}/conversations/`);
+      const convs = await res.json();
+      const list = document.getElementById('conv-list');
+      list.innerHTML = '';
+
+      convs.forEach(conv => {
+        const li = document.createElement('li');
+        li.textContent = `${conv.id}  —  ${conv.state}`;
+        li.onclick = () => loadMessages(conv.id);
+        list.appendChild(li);
+      });
+    }
+
+    // Busca e renderiza mensagens de uma conversa
+    async function loadMessages(convId) {
+      const res = await fetch(`${API_BASE}/conversations/${convId}/`);
+      const conv = await res.json();
+      document.getElementById('conv-id').textContent = convId;
+      const msgList = document.getElementById('msg-list');
+      msgList.innerHTML = '';
+
+      conv.messages.forEach(msg => {
+        const li = document.createElement('li');
+        li.textContent = `[${new Date(msg.timestamp).toLocaleString()}] ${msg.direction}: ${msg.content}`;
+        msgList.appendChild(li);
+      });
+
+      document.getElementById('messages').style.display = 'block';
+    }
+    
+    window.addEventListener('DOMContentLoaded', loadConversations);
+  </script>
+</body>
+</html>

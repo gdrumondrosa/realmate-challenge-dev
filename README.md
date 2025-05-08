@@ -144,6 +144,7 @@ python manage.py migrate
 python manage.py runserver
 ```
 
+5.	Para vizualização das conversas e mensagens criadas, basta abrir (com o servidor de desenvolvimento em execução) o arquivo ./frontend/index.html.
 
 ## 📌 Entrega e Requisitos
 
